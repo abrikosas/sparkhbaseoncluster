@@ -52,7 +52,7 @@ object HBaseAttackStream extends Serializable {
     println("Stream processing logic start")
 
     var attackDStream = ssc.textFileStream(fSource).map(Attack.parseEvent)
-    if (flagForSC.equals("F")) {
+    if (!flagForSC.equals("F")) {
       attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
     }
 
