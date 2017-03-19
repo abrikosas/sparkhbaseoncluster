@@ -1,7 +1,6 @@
 # sparkhbaseoncluster
 
-spark-submit  --class HBaseAttackStream target/sparkstreamhbase-1.0-SNAPSHOT-jar-with-dependencies.jar
-
+spark-submit -v  --master yarn --deploy-mode  cluster --class HBaseAttackStream target/sparkstreamhbase-1.0-SNAPSHOT-jar-with-dependencies.jar 19095 localhost test:attacksv3 af 1 /tmp/outstream
 
 /**
   * * @param args(0)        - port
