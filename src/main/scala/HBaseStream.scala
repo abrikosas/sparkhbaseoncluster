@@ -39,7 +39,7 @@ jobConfig.set("mapreduce.output.fileoutputformat.outputdir", "/tmp/out")
     //val sc = spark.sparkContext
     val ssc = new StreamingContext(sc, Seconds(1))
     println("Stream processing logic start")
-    val attackDStream = ssc.socketTextStream("localhost", 9095, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
+    val attackDStream = ssc.socketTextStream("localhost", args(0).toInt, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
     attackDStream.print()
 
     attackDStream.foreachRDD { rdd =>
