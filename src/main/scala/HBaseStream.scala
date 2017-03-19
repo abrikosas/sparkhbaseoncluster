@@ -8,6 +8,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.mapred.JobConf
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
+import org.apache.spark.rdd.RDD
 
 /**
   * * @param args(0)        - port
@@ -47,8 +48,15 @@ object HBaseAttackStream extends Serializable {
     Logger.getLogger("akka").setLevel(Level.OFF)
     val sc = new SparkContext()
     println("Stream processing logic start")
-    val attackDStream1 = sc.textFile(fSource).map(_.split("\\s+"))
-    attackDStream1.foreach(println)
+    val attackDStream1: RDD[Array[String]] = sc.textFile(fSource).map(_.split("\\s+"))
+
+
+    attackDStream1.foreach(line => {
+      for (i <- line)
+        println(i(0) + "    " + i(1))
+    })
+
+    //attackDStream1.foreach(println)
 
     // if (!flagForSC.equals("F")) {
     //   val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
@@ -81,7 +89,7 @@ object HBaseAttackStream extends Serializable {
     def parseEvent(str: String): ShortAttack = {
       val a: Array[String] = str.split("\\s+").filter(_.length == 10).filter(l => patternList.exists(_.contains()))
 
-      for (i <- a) {
+      for (i: String <- a) {
         println("eilute:" + i + "   Eilutes ilgis: " + i.length)
       }
 
