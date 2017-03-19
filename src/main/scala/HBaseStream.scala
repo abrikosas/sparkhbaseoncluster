@@ -8,7 +8,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.mapred.JobConf
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
-import org.apache.spark.rdd.RDD
 
 /**
   * * @param args(0)        - port
@@ -48,7 +47,7 @@ object HBaseAttackStream extends Serializable {
     Logger.getLogger("akka").setLevel(Level.OFF)
     val sc = new SparkContext()
     println("Stream processing logic start")
-    val attackDStream1: RDD[ShortAttack] = sc.textFile(fSource).map(Attack.parseEvent)
+    val attackDStream1 = sc.textFile(fSource).map(_.split("\\s+"))
     attackDStream1.foreach(println)
 
     // if (!flagForSC.equals("F")) {
