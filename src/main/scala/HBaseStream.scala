@@ -40,7 +40,7 @@ object HBaseAttackStream extends Serializable {
     conf.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
     val jobConfig: JobConf = new JobConf(conf, this.getClass)
-    jobConfig.set("mapreduce.output.fileoutputformat.outputdir", mrOutput)
+    //jobConfig.set("mapreduce.output.fileoutputformat.outputdir", mrOutput)
     jobConfig.setOutputFormat(classOf[TableOutputFormat])
     jobConfig.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
