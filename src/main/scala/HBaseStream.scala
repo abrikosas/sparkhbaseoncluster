@@ -50,10 +50,10 @@ object HBaseAttackStream extends Serializable {
     val sc = new SparkContext()
     val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
     println("Stream processing logic start")
-    var attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
 
+    var attackDStream = ssc.textFileStream(fSource).map(Attack.parseEvent)
     if (flagForSC.equals("F")) {
-      attackDStream = ssc.textFileStream(fSource).map(Attack.parseEvent)
+      attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
     }
 
 
