@@ -55,8 +55,8 @@ object HBaseAttackStream extends Serializable {
       for (i <- line)
         println("eilute:" + i)
     })
-
-    //attackDStream1.foreach(println)
+    println("----------------------------------VEL SPAUSDINU----------------------")
+    attackDStream1.foreach(println)
 
     // if (!flagForSC.equals("F")) {
     //   val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
