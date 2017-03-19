@@ -64,7 +64,7 @@ jobConfig.set("mapreduce.output.fileoutputformat.outputdir", "/tmp/out")
 
   object Attack extends Serializable {
     def parseEvent(str: String): ShortAttack = {
-      val a = str.split(",")
+      val a = str.split("\\s+").filter(_.length == 16).filter(l => patternList.exists(_.contains()))
       ShortAttack(a(0) + " " + a(1) + " " + a(2), a(9), a(12))
     }
 
