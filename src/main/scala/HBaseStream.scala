@@ -53,7 +53,7 @@ object HBaseAttackStream extends Serializable {
 
     attackDStream1.foreach(line => {
       for (i <- line)
-        println(i(0) + "    " + i(1))
+        println("eilute:" + i)
     })
 
     //attackDStream1.foreach(println)
