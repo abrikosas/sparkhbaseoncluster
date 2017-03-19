@@ -62,16 +62,19 @@ object HBaseAttackStream extends Serializable {
 
   }
 
-  case class Attack(monthe: String, daye: String, timee: String, unknown: String, ssh: String,
+  /*case class Attack(monthe: String, daye: String, timee: String, unknown: String, ssh: String,
                     failed: String, passw: String, forw: String, inv: String, user: String,
                     realuser: String, from: String, ip: String, port: String, unknown1: String,
-                    protocol: String)
+                    protocol: String)*/
+
+  case class Attack(monthe: String, daye: String, timee: String, localHostName: String, ssh: String,
+                    failed: String, userU: String, realuser: String, from: String, ip: String)
 
   case class ShortAttack(timestamp: String, realuser: String, ip: String)
 
   object Attack extends Serializable {
     def parseEvent(str: String): ShortAttack = {
-      val a: Array[String] = str.split("\\s+").filter(_.length == 16).filter(l => patternList.exists(_.contains()))
+      val a: Array[String] = str.split("\\s+").filter(_.length == 10).filter(l => patternList.exists(_.contains()))
 
       for (i <- a) {
         println("eilute:" + i + "   Eilutes ilgis: " + i.length)
