@@ -34,6 +34,8 @@ object HBaseAttackStream extends Serializable {
     val port = args(0).toInt
     val windowSize = args(4)
     val mrOutput = args(5)
+    val flagForSC = args(6)
+    val fSource = args(7)
     val conf = HBaseConfiguration.create()
     conf.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
@@ -48,7 +50,11 @@ object HBaseAttackStream extends Serializable {
     val sc = new SparkContext()
     val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
     println("Stream processing logic start")
-    val attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
+    var attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
+
+    if (flagForSC.equals("F")) {
+      attackDStream = ssc.textFileStream(fSource).map(Attack.parseEvent)
+    }
 
 
     attackDStream.foreachRDD { rdd =>
