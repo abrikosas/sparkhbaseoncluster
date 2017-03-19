@@ -8,8 +8,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.mapred.JobConf
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
-import org.apache.spark.storage.StorageLevel
-import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.rdd.RDD
 
 /**
   * * @param args(0)        - port
@@ -48,23 +47,24 @@ object HBaseAttackStream extends Serializable {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
     val sc = new SparkContext()
-    val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
     println("Stream processing logic start")
+    val attackDStream1: RDD[ShortAttack] = sc.textFile(fSource).map(Attack.parseEvent)
+    attackDStream1.foreach(println)
 
-    var attackDStream = ssc.textFileStream(fSource).map(Attack.parseEvent)
-    if (!flagForSC.equals("F")) {
-      attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
-    }
+    // if (!flagForSC.equals("F")) {
+    //   val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
+    //   val attackDStream: DStream[ShortAttack] = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
+    //}
 
 
-    attackDStream.foreachRDD { rdd =>
+    /* attackDStream.foreachRDD { rdd =>
 
-      // convert Attack data to put object and write to HBase table column family data
-      rdd.map(Attack.convertToPut(_, cfAttacker)).saveAsHadoopDataset(jobConfig)
-    }
-
-    ssc.start()
-    ssc.awaitTermination()
+       // convert Attack data to put object and write to HBase table column family data
+       rdd.map(Attack.convertToPut(_, cfAttacker)).saveAsHadoopDataset(jobConfig)
+     }
+ */
+    // ssc.start()
+    // ssc.awaitTermination()
 
   }
 
