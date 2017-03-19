@@ -49,7 +49,7 @@ object HBaseAttackStream extends Serializable {
     val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
     println("Stream processing logic start")
     val attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
-    attackDStream.print()
+
 
     attackDStream.foreachRDD { rdd =>
 
@@ -72,7 +72,11 @@ object HBaseAttackStream extends Serializable {
   object Attack extends Serializable {
     def parseEvent(str: String): ShortAttack = {
       val a: Array[String] = str.split("\\s+").filter(_.length == 16).filter(l => patternList.exists(_.contains()))
-      a.foreach(println)
+
+      for (i <- a) {
+        println("eilute:" + i + "   Eilutes ilgis: " + i.length)
+      }
+
 
       ShortAttack(a(0) + " " + a(1) + " " + a(2), a(9), a(12))
 
