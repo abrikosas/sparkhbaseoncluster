@@ -16,7 +16,8 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 object HBaseAttackStream extends Serializable {
   final val tableName = "test:attacksv3"
   final val cfAttacker = Bytes.toBytes("af")
-  final val patternList = List("Failed","failed")
+  //final val patternList = List("Failed","failed")
+  final val patternList = List("Invalid")
 
   def main(args: Array[String]): Unit = {
     // set up HBase Table configuration
@@ -64,8 +65,11 @@ jobConfig.set("mapreduce.output.fileoutputformat.outputdir", "/tmp/out")
 
   object Attack extends Serializable {
     def parseEvent(str: String): ShortAttack = {
-      val a = str.split("\\s+").filter(_.length == 16).filter(l => patternList.exists(_.contains()))
+      val a: Array[String] = str.split("\\s+").filter(_.length == 16).filter(l => patternList.exists(_.contains()))
+      a.foreach(println)
+
       ShortAttack(a(0) + " " + a(1) + " " + a(2), a(9), a(12))
+
     }
 
     //  Convert a row of Attack object data to an HBase put object
