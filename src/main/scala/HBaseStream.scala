@@ -77,7 +77,7 @@ object HBaseAttackStream extends Serializable {
     def parseEvent(str: Array[String]): ShortAttack = {
 
 
-      ShortAttack(str(0) + " " + str(1) + " " + str(2), str(9), str(12))
+      ShortAttack(str(0) + " " + str(1) + " " + str(2), str(8), str(9))
 
     }
 
