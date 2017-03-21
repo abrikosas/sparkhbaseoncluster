@@ -8,7 +8,8 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.mapred.JobConf
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
-import org.apache.spark.rdd.RDD
+import org.apache.spark.storage.StorageLevel
+import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 /**
   * * @param args(0)        - port
@@ -33,13 +34,11 @@ object HBaseAttackStream extends Serializable {
     val port = args(0).toInt
     val windowSize = args(4)
     val mrOutput = args(5)
-    val flagForSC = args(6)
-    val fSource = args(7)
     val conf = HBaseConfiguration.create()
     conf.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
     val jobConfig: JobConf = new JobConf(conf, this.getClass)
-    //jobConfig.set("mapreduce.output.fileoutputformat.outputdir", mrOutput)
+    jobConfig.set("mapreduce.output.fileoutputformat.outputdir", mrOutput)
     jobConfig.setOutputFormat(classOf[TableOutputFormat])
     jobConfig.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
@@ -47,31 +46,20 @@ object HBaseAttackStream extends Serializable {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
     val sc = new SparkContext()
+    val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
     println("Stream processing logic start")
-    val attackDStream1: RDD[Array[String]] = sc.textFile(fSource).map(_.split("\\s+"))
+    val attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(_.split("\\+"))
+      .filter(_.length == 16).map(Attack.parseEvent)
 
 
-    attackDStream1.foreach(line => {
-      for (i <- line)
-        println("eilute:" + i)
-    })
-    println("----------------------------------VEL SPAUSDINU----------------------")
-    attackDStream1.foreach(println)
+    attackDStream.foreachRDD { rdd =>
 
-    // if (!flagForSC.equals("F")) {
-    //   val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
-    //   val attackDStream: DStream[ShortAttack] = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(Attack.parseEvent)
-    //}
+      // convert Attack data to put object and write to HBase table column family data
+      rdd.map(Attack.convertToPut(_, cfAttacker)).saveAsHadoopDataset(jobConfig)
+    }
 
-
-    /* attackDStream.foreachRDD { rdd =>
-
-       // convert Attack data to put object and write to HBase table column family data
-       rdd.map(Attack.convertToPut(_, cfAttacker)).saveAsHadoopDataset(jobConfig)
-     }
- */
-    // ssc.start()
-    // ssc.awaitTermination()
+    ssc.start()
+    ssc.awaitTermination()
 
   }
 
@@ -86,15 +74,10 @@ object HBaseAttackStream extends Serializable {
   case class ShortAttack(timestamp: String, realuser: String, ip: String)
 
   object Attack extends Serializable {
-    def parseEvent(str: String): ShortAttack = {
-      val a: Array[String] = str.split("\\s+").filter(_.length == 10).filter(l => patternList.exists(_.contains()))
-
-      for (i: String <- a) {
-        println("eilute:" + i + "   Eilutes ilgis: " + i.length)
-      }
+    def parseEvent(str: Array[String]): ShortAttack = {
 
 
-      ShortAttack(a(0) + " " + a(1) + " " + a(2), a(9), a(12))
+      ShortAttack(str(0) + " " + str(1) + " " + str(2), str(9), str(12))
 
     }
 
