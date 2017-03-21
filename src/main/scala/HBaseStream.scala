@@ -49,7 +49,7 @@ object HBaseAttackStream extends Serializable {
     val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
     println("Stream processing logic start")
     val attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(_.split("\\+"))
-      .filter(_.length == 16).map(Attack.parseEvent)
+      .filter(_.length == 10).map(Attack.parseEvent)
 
 
     attackDStream.foreachRDD { rdd =>
