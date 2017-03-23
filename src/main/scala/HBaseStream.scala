@@ -8,7 +8,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.mapred.JobConf
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
-import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 /**
@@ -48,7 +47,8 @@ object HBaseAttackStream extends Serializable {
     val sc = new SparkContext()
     val ssc = new StreamingContext(sc, Seconds(windowSize.toInt))
     println("Stream processing logic start")
-    val attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(_.split("\\s+"))
+    //val attackDStream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER).map(_.split("\\s+"))
+    val attackDStream = ssc.textFileStream("/tmp/in/").map(_.split("\\s+"))
       .filter(_.length == 10).map(Attack.parseEvent)
 
 
